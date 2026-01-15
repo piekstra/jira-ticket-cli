@@ -20,7 +20,7 @@ func newFieldsCmd(opts *root.Options) *cobra.Command {
   jira-ticket-cli issues fields --custom
 
   # List editable fields for a specific issue
-  jira-ticket-cli issues fields MON-1234`,
+  jira-ticket-cli issues fields PROJ-123`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			issueKey := ""

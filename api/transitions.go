@@ -27,8 +27,8 @@ func (c *Client) GetTransitions(issueKey string) ([]Transition, error) {
 	return result.Transitions, nil
 }
 
-// DoTransition performs a transition on an issue
-func (c *Client) DoTransition(issueKey, transitionID string) error {
+// DoTransition performs a transition on an issue with optional fields
+func (c *Client) DoTransition(issueKey, transitionID string, fields map[string]interface{}) error {
 	if issueKey == "" {
 		return ErrIssueKeyRequired
 	}
@@ -36,6 +36,7 @@ func (c *Client) DoTransition(issueKey, transitionID string) error {
 	urlStr := fmt.Sprintf("%s/issue/%s/transitions", c.BaseURL, url.PathEscape(issueKey))
 	req := TransitionRequest{
 		Transition: TransitionID{ID: transitionID},
+		Fields:     fields,
 	}
 
 	_, err := c.post(urlStr, req)

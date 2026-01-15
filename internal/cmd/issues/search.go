@@ -14,10 +14,10 @@ func newSearchCmd(opts *root.Options) *cobra.Command {
 		Short: "Search issues using JQL",
 		Long:  "Search for issues using Jira Query Language (JQL).",
 		Example: `  # Search by JQL
-  jira-ticket-cli issues search --jql "project = MON AND status = 'In Progress'"
+  jira-ticket-cli issues search --jql "project = MYPROJECT AND status = 'In Progress'"
 
   # Search for recent issues
-  jira-ticket-cli issues search --jql "project = MON AND updated >= -7d"
+  jira-ticket-cli issues search --jql "project = MYPROJECT AND updated >= -7d"
 
   # Search issues assigned to current user
   jira-ticket-cli issues search --jql "assignee = currentUser() AND resolution = Unresolved"`,

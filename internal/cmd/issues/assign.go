@@ -13,10 +13,10 @@ func newAssignCmd(opts *root.Options) *cobra.Command {
 		Short: "Assign an issue to a user",
 		Long:  "Assign an issue to a user by their account ID, or unassign it.",
 		Example: `  # Assign to a user
-  jira-ticket-cli issues assign MON-1234 5b10ac8d82e05b22cc7d4ef5
+  jira-ticket-cli issues assign PROJ-123 5b10ac8d82e05b22cc7d4ef5
 
   # Unassign an issue
-  jira-ticket-cli issues assign MON-1234 --unassign`,
+  jira-ticket-cli issues assign PROJ-123 --unassign`,
 		Args: cobra.RangeArgs(1, 2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			accountID := ""

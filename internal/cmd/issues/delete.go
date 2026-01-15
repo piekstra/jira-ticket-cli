@@ -15,10 +15,10 @@ func newDeleteCmd(opts *root.Options) *cobra.Command {
 		Short: "Delete an issue",
 		Long:  "Permanently delete a Jira issue. This action cannot be undone.",
 		Example: `  # Delete an issue (will prompt for confirmation)
-  jira-ticket-cli issues delete MON-1234
+  jira-ticket-cli issues delete PROJ-123
 
   # Delete without confirmation
-  jira-ticket-cli issues delete MON-1234 --force`,
+  jira-ticket-cli issues delete PROJ-123 --force`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runDelete(opts, args[0], force)

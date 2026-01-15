@@ -28,7 +28,7 @@ func newListCmd(opts *root.Options) *cobra.Command {
 		Use:   "list <issue-key>",
 		Short: "List comments on an issue",
 		Long:  "List all comments on a specific issue.",
-		Example: `  jira-ticket-cli comments list MON-1234`,
+		Example: `  jira-ticket-cli comments list PROJ-123`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runList(opts, args[0], maxResults)
@@ -92,7 +92,7 @@ func newAddCmd(opts *root.Options) *cobra.Command {
 		Use:   "add <issue-key>",
 		Short: "Add a comment to an issue",
 		Long:  "Add a new comment to an issue.",
-		Example: `  jira-ticket-cli comments add MON-1234 --body "This is my comment"`,
+		Example: `  jira-ticket-cli comments add PROJ-123 --body "This is my comment"`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runAdd(opts, args[0], body)

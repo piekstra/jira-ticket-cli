@@ -34,7 +34,7 @@ func newListCmd(opts *root.Options) *cobra.Command {
   jira-ticket-cli boards list
 
   # List boards for a project
-  jira-ticket-cli boards list --project MON`,
+  jira-ticket-cli boards list --project MYPROJECT`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runList(opts, project, maxResults)
 		},

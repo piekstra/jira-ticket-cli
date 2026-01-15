@@ -310,7 +310,8 @@ type UpdateIssueRequest struct {
 
 // TransitionRequest represents a request to transition an issue
 type TransitionRequest struct {
-	Transition TransitionID `json:"transition"`
+	Transition TransitionID           `json:"transition"`
+	Fields     map[string]interface{} `json:"fields,omitempty"`
 }
 
 // TransitionID wraps a transition ID

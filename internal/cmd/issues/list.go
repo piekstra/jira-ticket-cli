@@ -17,13 +17,13 @@ func newListCmd(opts *root.Options) *cobra.Command {
 		Short: "List issues",
 		Long:  "List issues, optionally filtered by project and/or sprint.",
 		Example: `  # List issues in a project
-  jira-ticket-cli issues list --project MON
+  jira-ticket-cli issues list --project MYPROJECT
 
   # List issues in the current sprint
-  jira-ticket-cli issues list --project MON --sprint current
+  jira-ticket-cli issues list --project MYPROJECT --sprint current
 
   # List issues with custom limit
-  jira-ticket-cli issues list --project MON --max 100`,
+  jira-ticket-cli issues list --project MYPROJECT --max 100`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runList(opts, project, sprint, maxResults)
 		},

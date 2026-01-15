@@ -45,50 +45,50 @@ export JIRA_API_TOKEN=your-token
 
 ```bash
 # List issues in a project
-jira-ticket-cli issues list --project MON
+jira-ticket-cli issues list --project MYPROJECT
 
 # List issues in current sprint
-jira-ticket-cli issues list --project MON --sprint current
+jira-ticket-cli issues list --project MYPROJECT --sprint current
 
 # Get issue details
-jira-ticket-cli issues get MON-1234
+jira-ticket-cli issues get PROJ-123
 
 # Create an issue
-jira-ticket-cli issues create --project MON --type Task --summary "Fix login bug"
+jira-ticket-cli issues create --project MYPROJECT --type Task --summary "Fix login bug"
 
 # Update an issue
-jira-ticket-cli issues update MON-1234 --summary "New summary"
-jira-ticket-cli issues update MON-1234 --field priority=High
+jira-ticket-cli issues update PROJ-123 --summary "New summary"
+jira-ticket-cli issues update PROJ-123 --field priority=High
 
 # Search with JQL
-jira-ticket-cli issues search --jql "project = MON AND status = 'In Progress'"
+jira-ticket-cli issues search --jql "project = MYPROJECT AND status = 'In Progress'"
 
 # Assign an issue
-jira-ticket-cli issues assign MON-1234 5b10ac8d82e05b22cc7d4ef5
+jira-ticket-cli issues assign PROJ-123 5b10ac8d82e05b22cc7d4ef5
 
 # List available fields
 jira-ticket-cli issues fields
-jira-ticket-cli issues fields MON-1234  # editable fields for specific issue
+jira-ticket-cli issues fields PROJ-123  # editable fields for specific issue
 ```
 
 ### Transitions
 
 ```bash
 # List available transitions
-jira-ticket-cli transitions list MON-1234
+jira-ticket-cli transitions list PROJ-123
 
 # Perform a transition
-jira-ticket-cli transitions do MON-1234 "In Progress"
+jira-ticket-cli transitions do PROJ-123 "In Progress"
 ```
 
 ### Comments
 
 ```bash
 # List comments
-jira-ticket-cli comments list MON-1234
+jira-ticket-cli comments list PROJ-123
 
 # Add a comment
-jira-ticket-cli comments add MON-1234 --body "This is my comment"
+jira-ticket-cli comments add PROJ-123 --body "This is my comment"
 ```
 
 ### Sprints
@@ -109,7 +109,7 @@ jira-ticket-cli sprints issues 456
 ```bash
 # List boards
 jira-ticket-cli boards list
-jira-ticket-cli boards list --project MON
+jira-ticket-cli boards list --project MYPROJECT
 
 # Get board details
 jira-ticket-cli boards get 123
@@ -124,7 +124,7 @@ Use `--output` or `-o` to change output format:
 - `plain`: Tab-separated values
 
 ```bash
-jira-ticket-cli issues list --project MON -o json
+jira-ticket-cli issues list --project MYPROJECT -o json
 ```
 
 ## Shell Completion
