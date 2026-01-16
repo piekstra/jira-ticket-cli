@@ -3,8 +3,9 @@ package issues
 import (
 	"fmt"
 
-	"github.com/piekstra/jira-ticket-cli/internal/cmd/root"
 	"github.com/spf13/cobra"
+
+	"github.com/piekstra/jira-ticket-cli/internal/cmd/root"
 )
 
 func newDeleteCmd(opts *root.Options) *cobra.Command {

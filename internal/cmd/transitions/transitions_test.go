@@ -3,16 +3,17 @@ package transitions
 import (
 	"testing"
 
-	"github.com/piekstra/jira-ticket-cli/api"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/piekstra/jira-ticket-cli/api"
 )
 
 func TestFormatFieldValue(t *testing.T) {
 	tests := []struct {
-		name   string
-		field  *api.Field
-		value  string
-		want   interface{}
+		name  string
+		field *api.Field
+		value string
+		want  interface{}
 	}{
 		{
 			name:  "nil field - returns string as-is",

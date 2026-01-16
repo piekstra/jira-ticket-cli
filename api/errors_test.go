@@ -12,9 +12,9 @@ import (
 
 func TestAPIError_Error(t *testing.T) {
 	tests := []struct {
-		name    string
-		apiErr  *APIError
-		want    string
+		name   string
+		apiErr *APIError
+		want   string
 	}{
 		{
 			name: "with error messages",

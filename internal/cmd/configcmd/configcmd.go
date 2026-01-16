@@ -3,9 +3,10 @@ package configcmd
 import (
 	"os"
 
+	"github.com/spf13/cobra"
+
 	"github.com/piekstra/jira-ticket-cli/internal/cmd/root"
 	"github.com/piekstra/jira-ticket-cli/internal/config"
-	"github.com/spf13/cobra"
 )
 
 // Register registers the config commands

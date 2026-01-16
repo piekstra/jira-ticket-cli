@@ -25,9 +25,9 @@ var (
 
 // APIError represents an error response from the Jira API
 type APIError struct {
-	StatusCode   int
+	StatusCode    int
 	ErrorMessages []string          `json:"errorMessages"`
-	Errors       map[string]string `json:"errors"`
+	Errors        map[string]string `json:"errors"`
 }
 
 func (e *APIError) Error() string {

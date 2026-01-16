@@ -8,14 +8,14 @@ import (
 
 // ProjectDetail represents detailed project information
 type ProjectDetail struct {
-	ID          string       `json:"id"`
-	Key         string       `json:"key"`
-	Name        string       `json:"name"`
-	Description string       `json:"description,omitempty"`
-	Lead        *User        `json:"lead,omitempty"`
-	IssueTypes  []IssueType  `json:"issueTypes,omitempty"`
-	Components  []Component  `json:"components,omitempty"`
-	URL         string       `json:"url,omitempty"`
+	ID          string      `json:"id"`
+	Key         string      `json:"key"`
+	Name        string      `json:"name"`
+	Description string      `json:"description,omitempty"`
+	Lead        *User       `json:"lead,omitempty"`
+	IssueTypes  []IssueType `json:"issueTypes,omitempty"`
+	Components  []Component `json:"components,omitempty"`
+	URL         string      `json:"url,omitempty"`
 }
 
 // ListProjects returns all projects

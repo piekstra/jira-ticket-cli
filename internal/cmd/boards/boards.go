@@ -3,8 +3,9 @@ package boards
 import (
 	"fmt"
 
-	"github.com/piekstra/jira-ticket-cli/internal/cmd/root"
 	"github.com/spf13/cobra"
+
+	"github.com/piekstra/jira-ticket-cli/internal/cmd/root"
 )
 
 // Register registers the boards commands
@@ -85,11 +86,11 @@ func runList(opts *root.Options, project string, maxResults int) error {
 
 func newGetCmd(opts *root.Options) *cobra.Command {
 	return &cobra.Command{
-		Use:   "get <board-id>",
-		Short: "Get board details",
-		Long:  "Get details for a specific board.",
+		Use:     "get <board-id>",
+		Short:   "Get board details",
+		Long:    "Get details for a specific board.",
 		Example: `  jira-ticket-cli boards get 123`,
-		Args: cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var boardID int
 			if _, err := fmt.Sscanf(args[0], "%d", &boardID); err != nil {

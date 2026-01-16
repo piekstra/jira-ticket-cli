@@ -1,8 +1,9 @@
 package issues
 
 import (
-	"github.com/piekstra/jira-ticket-cli/internal/cmd/root"
 	"github.com/spf13/cobra"
+
+	"github.com/piekstra/jira-ticket-cli/internal/cmd/root"
 )
 
 func newSearchCmd(opts *root.Options) *cobra.Command {

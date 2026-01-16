@@ -1,9 +1,10 @@
 package issues
 
 import (
+	"github.com/spf13/cobra"
+
 	"github.com/piekstra/jira-ticket-cli/api"
 	"github.com/piekstra/jira-ticket-cli/internal/cmd/root"
-	"github.com/spf13/cobra"
 )
 
 func newFieldsCmd(opts *root.Options) *cobra.Command {

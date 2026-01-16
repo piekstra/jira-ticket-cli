@@ -124,9 +124,9 @@ func TestView_Plain(t *testing.T) {
 
 func TestView_Render(t *testing.T) {
 	tests := []struct {
-		name    string
-		format  Format
-		check   func(t *testing.T, output string)
+		name   string
+		format Format
+		check  func(t *testing.T, output string)
 	}{
 		{
 			name:   "table format",

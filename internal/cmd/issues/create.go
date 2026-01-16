@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/piekstra/jira-ticket-cli/api"
 	"github.com/piekstra/jira-ticket-cli/internal/cmd/root"
-	"github.com/spf13/cobra"
 )
 
 func newCreateCmd(opts *root.Options) *cobra.Command {

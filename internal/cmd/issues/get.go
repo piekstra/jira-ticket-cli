@@ -3,8 +3,9 @@ package issues
 import (
 	"fmt"
 
-	"github.com/piekstra/jira-ticket-cli/internal/cmd/root"
 	"github.com/spf13/cobra"
+
+	"github.com/piekstra/jira-ticket-cli/internal/cmd/root"
 )
 
 func newGetCmd(opts *root.Options) *cobra.Command {
@@ -86,13 +87,6 @@ func runGet(opts *root.Options, issueKey string) error {
 	v.Println("URL:         %s", client.IssueURL(issue.Key))
 
 	return nil
-}
-
-func formatStatus(status string) string {
-	if status == "" {
-		return "-"
-	}
-	return status
 }
 
 func formatAssignee(name string) string {

@@ -10,31 +10,30 @@ import (
 )
 
 // setupTestConfig creates a temporary config directory for testing
-// On macOS, os.UserConfigDir() returns $HOME/Library/Application Support
-// So we manipulate HOME to point to a temp directory
+// Uses t.Setenv for automatic cleanup and t.TempDir for automatic removal
 func setupTestConfig(t *testing.T) (string, func()) {
 	t.Helper()
 
-	// Save original HOME
-	origHome := os.Getenv("HOME")
+	// Use t.TempDir() which auto-cleans after test
+	tempDir := t.TempDir()
 
-	// Create temp directory structure
-	tempDir, err := os.MkdirTemp("", "jira-cli-test-*")
-	require.NoError(t, err)
+	// Use t.Setenv which auto-restores after test (Go 1.17+)
+	// XDG_CONFIG_HOME is used on Linux, HOME+Library/App Support on macOS
+	t.Setenv("XDG_CONFIG_HOME", tempDir)
+	t.Setenv("HOME", tempDir)
 
-	// Create Library/Application Support structure for macOS
+	// Clear any JIRA env vars that might interfere
+	t.Setenv("JIRA_DOMAIN", "")
+	t.Setenv("JIRA_EMAIL", "")
+	t.Setenv("JIRA_API_TOKEN", "")
+
+	// Create macOS-style dir as well for fallback
 	libDir := filepath.Join(tempDir, "Library", "Application Support")
-	err = os.MkdirAll(libDir, 0700)
+	err := os.MkdirAll(libDir, 0700)
 	require.NoError(t, err)
 
-	// Set HOME to temp directory
-	os.Setenv("HOME", tempDir)
-
-	// Return cleanup function
-	return libDir, func() {
-		os.RemoveAll(tempDir)
-		os.Setenv("HOME", origHome)
-	}
+	// Return empty cleanup since t.TempDir and t.Setenv handle it
+	return tempDir, func() {}
 }
 
 func TestConfig_SaveAndLoad(t *testing.T) {
@@ -106,7 +105,7 @@ func TestConfig_Clear_NotExists(t *testing.T) {
 }
 
 func TestConfig_FilePermissions(t *testing.T) {
-	configBaseDir, cleanup := setupTestConfig(t)
+	_, cleanup := setupTestConfig(t)
 	defer cleanup()
 
 	cfg := &Config{
@@ -117,9 +116,8 @@ func TestConfig_FilePermissions(t *testing.T) {
 	err := Save(cfg)
 	require.NoError(t, err)
 
-	// Check file permissions
-	// configBaseDir is Library/Application Support, config goes under jira-ticket-cli/
-	configFile := filepath.Join(configBaseDir, configDirName, configFileName)
+	// Check file permissions using Path() to get actual config location
+	configFile := Path()
 	info, err := os.Stat(configFile)
 	require.NoError(t, err)
 
