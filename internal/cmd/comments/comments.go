@@ -1,8 +1,9 @@
 package comments
 
 import (
-	"github.com/piekstra/jira-ticket-cli/internal/cmd/root"
 	"github.com/spf13/cobra"
+
+	"github.com/piekstra/jira-ticket-cli/internal/cmd/root"
 )
 
 // Register registers the comments commands
