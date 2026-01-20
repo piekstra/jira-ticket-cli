@@ -58,3 +58,17 @@ func (c *Client) AddComment(issueKey, commentBody string) (*Comment, error) {
 
 	return &comment, nil
 }
+
+// DeleteComment deletes a comment from an issue
+func (c *Client) DeleteComment(issueKey, commentID string) error {
+	if issueKey == "" {
+		return ErrIssueKeyRequired
+	}
+	if commentID == "" {
+		return fmt.Errorf("comment ID is required")
+	}
+
+	urlStr := fmt.Sprintf("%s/issue/%s/comment/%s", c.BaseURL, url.PathEscape(issueKey), url.PathEscape(commentID))
+	_, err := c.delete(urlStr)
+	return err
+}

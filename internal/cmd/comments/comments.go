@@ -17,6 +17,7 @@ func Register(parent *cobra.Command, opts *root.Options) {
 
 	cmd.AddCommand(newListCmd(opts))
 	cmd.AddCommand(newAddCmd(opts))
+	cmd.AddCommand(newDeleteCmd(opts))
 
 	parent.AddCommand(cmd)
 }
@@ -123,6 +124,41 @@ func runAdd(opts *root.Options, issueKey, body string) error {
 	}
 
 	v.Success("Added comment %s to %s", comment.ID, issueKey)
+	return nil
+}
+
+func newDeleteCmd(opts *root.Options) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "delete <issue-key> <comment-id>",
+		Short:   "Delete a comment from an issue",
+		Long:    "Delete an existing comment from an issue.",
+		Example: `  jira-ticket-cli comments delete PROJ-123 12345`,
+		Args:    cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runDelete(opts, args[0], args[1])
+		},
+	}
+
+	return cmd
+}
+
+func runDelete(opts *root.Options, issueKey, commentID string) error {
+	v := opts.View()
+
+	client, err := opts.APIClient()
+	if err != nil {
+		return err
+	}
+
+	if err := client.DeleteComment(issueKey, commentID); err != nil {
+		return err
+	}
+
+	if opts.Output == "json" {
+		return v.JSON(map[string]string{"status": "deleted", "commentId": commentID})
+	}
+
+	v.Success("Deleted comment %s from %s", commentID, issueKey)
 	return nil
 }
 
