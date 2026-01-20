@@ -6,12 +6,14 @@ import (
 
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
+	"github.com/yuin/goldmark/extension"
+	east "github.com/yuin/goldmark/extension/ast"
 	"github.com/yuin/goldmark/text"
 )
 
 // MarkdownToADF converts markdown text to an Atlassian Document Format document.
 // Supports: headings (h1-h6), paragraphs, bold, italic, strikethrough, code,
-// code blocks, bullet lists, numbered lists, links, and blockquotes.
+// code blocks, bullet lists, numbered lists, links, blockquotes, and tables.
 func MarkdownToADF(markdown string) *ADFDocument {
 	if markdown == "" {
 		return nil
@@ -19,8 +21,11 @@ func MarkdownToADF(markdown string) *ADFDocument {
 
 	source := []byte(markdown)
 	reader := text.NewReader(source)
-	parser := goldmark.DefaultParser()
-	doc := parser.Parse(reader)
+	// Use goldmark with table extension
+	md := goldmark.New(goldmark.WithExtensions(
+		extension.Table,
+	))
+	doc := md.Parser().Parse(reader)
 
 	content := convertNodes(doc, source)
 
@@ -75,6 +80,8 @@ func convertNode(node ast.Node, source []byte) *ADFNode {
 		return convertBlockquote(n, source)
 	case *ast.ThematicBreak:
 		return &ADFNode{Type: "rule"}
+	case *east.Table:
+		return convertTable(n, source)
 	default:
 		return nil
 	}
@@ -296,4 +303,55 @@ func applyMark(nodes []ADFNode, markType string, attrs ...map[string]interface{}
 		nodes[i].Marks = append(nodes[i].Marks, mark)
 	}
 	return nodes
+}
+
+func convertTable(table *east.Table, source []byte) *ADFNode {
+	var rows []ADFNode
+
+	for child := table.FirstChild(); child != nil; child = child.NextSibling() {
+		switch row := child.(type) {
+		case *east.TableHeader:
+			rows = append(rows, convertTableRow(row, source, true))
+		case *east.TableRow:
+			rows = append(rows, convertTableRow(row, source, false))
+		}
+	}
+
+	return &ADFNode{
+		Type:    "table",
+		Content: rows,
+	}
+}
+
+func convertTableRow(row ast.Node, source []byte, isHeader bool) ADFNode {
+	var cells []ADFNode
+
+	for child := row.FirstChild(); child != nil; child = child.NextSibling() {
+		if cell, ok := child.(*east.TableCell); ok {
+			cellType := "tableCell"
+			if isHeader {
+				cellType = "tableHeader"
+			}
+
+			content := convertInlineContent(cell, source)
+			// ADF table cells need paragraph wrappers
+			cellContent := []ADFNode{}
+			if len(content) > 0 {
+				cellContent = append(cellContent, ADFNode{
+					Type:    "paragraph",
+					Content: content,
+				})
+			}
+
+			cells = append(cells, ADFNode{
+				Type:    cellType,
+				Content: cellContent,
+			})
+		}
+	}
+
+	return ADFNode{
+		Type:    "tableRow",
+		Content: cells,
+	}
 }

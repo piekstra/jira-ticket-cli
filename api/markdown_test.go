@@ -205,6 +205,35 @@ func TestMarkdownToADF_HorizontalRule(t *testing.T) {
 	assert.True(t, foundRule, "Should find horizontal rule")
 }
 
+func TestMarkdownToADF_Table(t *testing.T) {
+	markdown := `| Header 1 | Header 2 |
+|----------|----------|
+| Cell 1   | Cell 2   |
+| Cell 3   | Cell 4   |`
+
+	result := MarkdownToADF(markdown)
+	require.NotNil(t, result)
+	require.Len(t, result.Content, 1)
+
+	table := result.Content[0]
+	assert.Equal(t, "table", table.Type)
+	require.Len(t, table.Content, 3) // 1 header row + 2 data rows
+
+	// Check header row
+	headerRow := table.Content[0]
+	assert.Equal(t, "tableRow", headerRow.Type)
+	require.Len(t, headerRow.Content, 2)
+	assert.Equal(t, "tableHeader", headerRow.Content[0].Type)
+	assert.Equal(t, "tableHeader", headerRow.Content[1].Type)
+
+	// Check data row
+	dataRow := table.Content[1]
+	assert.Equal(t, "tableRow", dataRow.Type)
+	require.Len(t, dataRow.Content, 2)
+	assert.Equal(t, "tableCell", dataRow.Content[0].Type)
+	assert.Equal(t, "tableCell", dataRow.Content[1].Type)
+}
+
 func TestMarkdownToADF_ComplexDocument(t *testing.T) {
 	markdown := `# Issue Title
 
