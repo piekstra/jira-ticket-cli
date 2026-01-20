@@ -272,9 +272,10 @@ See [documentation](https://docs.example.com) for more info.`
 	for _, node := range result.Content {
 		switch node.Type {
 		case "heading":
-			if node.Attrs["level"] == 1 {
+			switch node.Attrs["level"] {
+			case 1:
 				hasH1 = true
-			} else if node.Attrs["level"] == 2 {
+			case 2:
 				hasH2 = true
 			}
 		case "orderedList":
