@@ -1,6 +1,8 @@
 package api
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -305,4 +307,64 @@ func TestFormatFieldValue_TextareaField(t *testing.T) {
 	assert.Equal(t, 1, adf.Version)
 	require.Len(t, adf.Content, 1)
 	assert.Equal(t, "paragraph", adf.Content[0].Type)
+}
+
+func TestClient_GetFieldOptionsFromEditMeta(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Contains(t, r.URL.Path, "/issue/PROJ-123/editmeta")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"fields": {
+				"priority": {
+					"name": "Priority",
+					"allowedValues": [
+						{"id": "1", "name": "Highest"},
+						{"id": "2", "name": "High"},
+						{"id": "3", "name": "Medium"},
+						{"id": "4", "name": "Low"},
+						{"id": "5", "name": "Lowest"}
+					]
+				},
+				"customfield_10001": {
+					"name": "Change Type",
+					"allowedValues": [
+						{"id": "10", "value": "Feature"},
+						{"id": "11", "value": "Bug Fix"},
+						{"id": "12", "value": "Refactor", "disabled": true}
+					]
+				}
+			}
+		}`))
+	}))
+	defer server.Close()
+
+	client := &Client{
+		BaseURL:    server.URL,
+		Email:      "user@example.com",
+		APIToken:   "token",
+		HTTPClient: server.Client(),
+	}
+
+	t.Run("priority field with name values", func(t *testing.T) {
+		options, err := client.GetFieldOptionsFromEditMeta("PROJ-123", "priority")
+		require.NoError(t, err)
+		assert.Len(t, options, 5)
+		assert.Equal(t, "1", options[0].ID)
+		assert.Equal(t, "Highest", options[0].Name)
+	})
+
+	t.Run("custom field with value format", func(t *testing.T) {
+		options, err := client.GetFieldOptionsFromEditMeta("PROJ-123", "customfield_10001")
+		require.NoError(t, err)
+		assert.Len(t, options, 3)
+		assert.Equal(t, "Feature", options[0].Value)
+		assert.Equal(t, "Refactor", options[2].Value)
+		assert.True(t, options[2].Disabled)
+	})
+
+	t.Run("field not found", func(t *testing.T) {
+		_, err := client.GetFieldOptionsFromEditMeta("PROJ-123", "nonexistent")
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "not found")
+	})
 }
