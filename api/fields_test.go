@@ -163,3 +163,146 @@ func TestResolveFieldID_EmptySlice(t *testing.T) {
 	_, err := ResolveFieldID([]Field{}, "summary")
 	assert.Error(t, err)
 }
+
+func TestFormatFieldValue(t *testing.T) {
+	tests := []struct {
+		name  string
+		field *Field
+		value string
+		want  interface{}
+	}{
+		{
+			name:  "nil field - returns string as-is",
+			field: nil,
+			value: "some value",
+			want:  "some value",
+		},
+		{
+			name: "option field - wraps in value map",
+			field: &Field{
+				ID:   "customfield_10001",
+				Name: "Change Type",
+				Schema: FieldSchema{
+					Type: "option",
+				},
+			},
+			value: "Bug Fix",
+			want:  map[string]string{"value": "Bug Fix"},
+		},
+		{
+			name: "array of options - wraps in array of value maps",
+			field: &Field{
+				ID:   "customfield_10002",
+				Name: "Categories",
+				Schema: FieldSchema{
+					Type:  "array",
+					Items: "option",
+				},
+			},
+			value: "Frontend",
+			want:  []map[string]string{{"value": "Frontend"}},
+		},
+		{
+			name: "array of strings - wraps in string array",
+			field: &Field{
+				ID:   "labels",
+				Name: "Labels",
+				Schema: FieldSchema{
+					Type:  "array",
+					Items: "string",
+				},
+			},
+			value: "urgent",
+			want:  []string{"urgent"},
+		},
+		{
+			name: "user field - wraps in accountId map",
+			field: &Field{
+				ID:   "assignee",
+				Name: "Assignee",
+				Schema: FieldSchema{
+					Type: "user",
+				},
+			},
+			value: "abc123",
+			want:  map[string]string{"accountId": "abc123"},
+		},
+		{
+			name: "string field - returns as-is",
+			field: &Field{
+				ID:   "summary",
+				Name: "Summary",
+				Schema: FieldSchema{
+					Type: "string",
+				},
+			},
+			value: "Updated summary",
+			want:  "Updated summary",
+		},
+		{
+			name: "number field - converts to float64",
+			field: &Field{
+				ID:   "customfield_10003",
+				Name: "Story Points",
+				Schema: FieldSchema{
+					Type: "number",
+				},
+			},
+			value: "5",
+			want:  float64(5),
+		},
+		{
+			name: "number field with decimal",
+			field: &Field{
+				ID:   "customfield_10003",
+				Name: "Story Points",
+				Schema: FieldSchema{
+					Type: "number",
+				},
+			},
+			value: "3.5",
+			want:  float64(3.5),
+		},
+		{
+			name: "number field with invalid value - returns string",
+			field: &Field{
+				ID:   "customfield_10003",
+				Name: "Story Points",
+				Schema: FieldSchema{
+					Type: "number",
+				},
+			},
+			value: "not-a-number",
+			want:  "not-a-number",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := FormatFieldValue(tt.field, tt.value)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestFormatFieldValue_TextareaField(t *testing.T) {
+	field := &Field{
+		ID:   "customfield_10046",
+		Name: "QA Notes",
+		Schema: FieldSchema{
+			Type:   "string",
+			Custom: "com.atlassian.jira.plugin.system.customfieldtypes:textarea",
+		},
+	}
+
+	got := FormatFieldValue(field, "Testing notes here")
+
+	// Textarea fields should return ADF document
+	adf, ok := got.(*ADFDocument)
+	require.True(t, ok, "expected *ADFDocument, got %T", got)
+	require.NotNil(t, adf)
+	assert.Equal(t, "doc", adf.Type)
+	assert.Equal(t, 1, adf.Version)
+	require.Len(t, adf.Content, 1)
+	assert.Equal(t, "paragraph", adf.Content[0].Type)
+}
