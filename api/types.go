@@ -99,23 +99,10 @@ type ADFMark struct {
 	Attrs map[string]interface{} `json:"attrs,omitempty"`
 }
 
-// NewADFDocument creates a simple text ADF document
+// NewADFDocument creates an ADF document from markdown text.
+// Supports headings, bold, italic, code, code blocks, lists, links, and blockquotes.
 func NewADFDocument(text string) *ADFDocument {
-	if text == "" {
-		return nil
-	}
-	return &ADFDocument{
-		Type:    "doc",
-		Version: 1,
-		Content: []ADFNode{
-			{
-				Type: "paragraph",
-				Content: []ADFNode{
-					{Type: "text", Text: text},
-				},
-			},
-		},
-	}
+	return MarkdownToADF(text)
 }
 
 // ToPlainText extracts plain text from an ADF document
