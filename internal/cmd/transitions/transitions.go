@@ -29,9 +29,9 @@ func newListCmd(opts *root.Options) *cobra.Command {
 	var showFields bool
 
 	cmd := &cobra.Command{
-		Use:     "list <issue-key>",
-		Short:   "List available transitions",
-		Long:    "List the available workflow transitions for an issue.",
+		Use:   "list <issue-key>",
+		Short: "List available transitions",
+		Long:  "List the available workflow transitions for an issue.",
 		Example: `  # List transitions
   jira-ticket-cli transitions list PROJ-123
 

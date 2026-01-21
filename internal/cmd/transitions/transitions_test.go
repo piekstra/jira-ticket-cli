@@ -114,8 +114,8 @@ func TestGetRequiredFields(t *testing.T) {
 		{
 			name: "no fields",
 			transition: api.Transition{
-				ID:   "21",
-				Name: "In Progress",
+				ID:     "21",
+				Name:   "In Progress",
 				Fields: nil,
 			},
 			want: "-",
