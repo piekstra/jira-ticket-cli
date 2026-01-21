@@ -418,3 +418,94 @@ func TestTransitionRequest_MarshalJSON(t *testing.T) {
 	resolution := fields["resolution"].(map[string]interface{})
 	assert.Equal(t, "Done", resolution["name"])
 }
+
+func TestIssueFields_CustomFields(t *testing.T) {
+	// Test unmarshaling with custom fields
+	input := `{
+		"summary": "Test Issue",
+		"status": {"id": "1", "name": "Open"},
+		"customfield_10001": 5,
+		"customfield_10002": {"value": "Feature"},
+		"customfield_10003": ["label1", "label2"]
+	}`
+
+	var fields IssueFields
+	err := json.Unmarshal([]byte(input), &fields)
+	require.NoError(t, err)
+
+	// Standard fields should be parsed
+	assert.Equal(t, "Test Issue", fields.Summary)
+	assert.NotNil(t, fields.Status)
+	assert.Equal(t, "Open", fields.Status.Name)
+
+	// Custom fields should be captured
+	assert.NotNil(t, fields.CustomFields)
+	assert.Equal(t, float64(5), fields.CustomFields["customfield_10001"])
+
+	customfield_10002 := fields.CustomFields["customfield_10002"].(map[string]interface{})
+	assert.Equal(t, "Feature", customfield_10002["value"])
+
+	customfield_10003 := fields.CustomFields["customfield_10003"].([]interface{})
+	assert.Len(t, customfield_10003, 2)
+}
+
+func TestIssueFields_MarshalJSON_IncludesCustomFields(t *testing.T) {
+	fields := IssueFields{
+		Summary: "Test Issue",
+		Status:  &Status{ID: "1", Name: "Open"},
+		CustomFields: map[string]interface{}{
+			"customfield_10001": 5,
+			"customfield_10002": map[string]string{"value": "Feature"},
+		},
+	}
+
+	data, err := json.Marshal(fields)
+	require.NoError(t, err)
+
+	var result map[string]interface{}
+	err = json.Unmarshal(data, &result)
+	require.NoError(t, err)
+
+	// Standard fields should be present
+	assert.Equal(t, "Test Issue", result["summary"])
+
+	// Custom fields should be included
+	assert.Equal(t, float64(5), result["customfield_10001"])
+	customfield_10002 := result["customfield_10002"].(map[string]interface{})
+	assert.Equal(t, "Feature", customfield_10002["value"])
+}
+
+func TestIssue_RoundTrip_WithCustomFields(t *testing.T) {
+	// Test full issue round-trip with custom fields
+	input := `{
+		"id": "10001",
+		"key": "PROJ-123",
+		"self": "https://example.atlassian.net/rest/api/3/issue/10001",
+		"fields": {
+			"summary": "Test Issue",
+			"customfield_10001": 8,
+			"customfield_10002": {"value": "Bug Fix"},
+			"customfield_sprint": {"id": 42, "name": "Sprint 5"}
+		}
+	}`
+
+	var issue Issue
+	err := json.Unmarshal([]byte(input), &issue)
+	require.NoError(t, err)
+
+	// Verify custom fields were captured
+	assert.Equal(t, float64(8), issue.Fields.CustomFields["customfield_10001"])
+
+	// Marshal back to JSON
+	data, err := json.Marshal(issue)
+	require.NoError(t, err)
+
+	// Verify custom fields are in the output
+	var result map[string]interface{}
+	err = json.Unmarshal(data, &result)
+	require.NoError(t, err)
+
+	fields := result["fields"].(map[string]interface{})
+	assert.Equal(t, float64(8), fields["customfield_10001"])
+	assert.Equal(t, "Bug Fix", fields["customfield_10002"].(map[string]interface{})["value"])
+}

@@ -29,6 +29,105 @@ type IssueFields struct {
 	Components  []Component  `json:"components,omitempty"`
 	Sprint      *Sprint      `json:"sprint,omitempty"`
 	Parent      *Issue       `json:"parent,omitempty"`
+
+	// CustomFields holds any fields not mapped to struct fields (e.g., customfield_10001)
+	CustomFields map[string]interface{} `json:"-"`
+}
+
+// knownFieldKeys lists JSON keys for typed struct fields
+var knownFieldKeys = map[string]bool{
+	"summary": true, "description": true, "status": true,
+	"issuetype": true, "priority": true, "assignee": true,
+	"reporter": true, "project": true, "created": true,
+	"updated": true, "labels": true, "components": true,
+	"sprint": true, "parent": true,
+}
+
+// UnmarshalJSON custom unmarshaler to capture custom fields
+func (f *IssueFields) UnmarshalJSON(data []byte) error {
+	// First, unmarshal into a temp struct to get typed fields
+	type Alias IssueFields
+	aux := &struct {
+		*Alias
+	}{
+		Alias: (*Alias)(f),
+	}
+	if err := json.Unmarshal(data, aux); err != nil {
+		return err
+	}
+
+	// Then unmarshal into a map to capture all fields
+	var raw map[string]json.RawMessage
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+
+	// Extract custom fields (those not in knownFieldKeys)
+	f.CustomFields = make(map[string]interface{})
+	for key, value := range raw {
+		if !knownFieldKeys[key] {
+			var v interface{}
+			if err := json.Unmarshal(value, &v); err == nil {
+				f.CustomFields[key] = v
+			}
+		}
+	}
+
+	return nil
+}
+
+// MarshalJSON custom marshaler to include custom fields
+func (f IssueFields) MarshalJSON() ([]byte, error) {
+	// Start with typed fields
+	result := make(map[string]interface{})
+
+	result["summary"] = f.Summary
+	if f.Description != nil {
+		result["description"] = f.Description
+	}
+	if f.Status != nil {
+		result["status"] = f.Status
+	}
+	if f.IssueType != nil {
+		result["issuetype"] = f.IssueType
+	}
+	if f.Priority != nil {
+		result["priority"] = f.Priority
+	}
+	if f.Assignee != nil {
+		result["assignee"] = f.Assignee
+	}
+	if f.Reporter != nil {
+		result["reporter"] = f.Reporter
+	}
+	if f.Project != nil {
+		result["project"] = f.Project
+	}
+	if f.Created != "" {
+		result["created"] = f.Created
+	}
+	if f.Updated != "" {
+		result["updated"] = f.Updated
+	}
+	if len(f.Labels) > 0 {
+		result["labels"] = f.Labels
+	}
+	if len(f.Components) > 0 {
+		result["components"] = f.Components
+	}
+	if f.Sprint != nil {
+		result["sprint"] = f.Sprint
+	}
+	if f.Parent != nil {
+		result["parent"] = f.Parent
+	}
+
+	// Add custom fields
+	for key, value := range f.CustomFields {
+		result[key] = value
+	}
+
+	return json.Marshal(result)
 }
 
 // Description can be either a string (Agile API) or ADF document (REST API v3)
