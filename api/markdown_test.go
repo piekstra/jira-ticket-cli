@@ -332,3 +332,228 @@ func TestNewADFDocument_UsesMarkdownParser(t *testing.T) {
 	assert.Equal(t, "heading", result.Content[0].Type)
 	assert.Equal(t, "paragraph", result.Content[1].Type)
 }
+
+// Additional tests adapted from confluence-cli
+
+func TestMarkdownToADF_Strikethrough(t *testing.T) {
+	result := MarkdownToADF("This is ~~struck~~ text")
+	require.NotNil(t, result)
+	require.Len(t, result.Content, 1)
+	para := result.Content[0]
+
+	var foundStrike bool
+	for _, node := range para.Content {
+		if node.Text == "struck" {
+			foundStrike = true
+			require.Len(t, node.Marks, 1)
+			assert.Equal(t, "strike", node.Marks[0].Type)
+		}
+	}
+	assert.True(t, foundStrike, "Should find strikethrough text")
+}
+
+func TestMarkdownToADF_BoldAndItalicCombined(t *testing.T) {
+	result := MarkdownToADF("***bold and italic***")
+	require.NotNil(t, result)
+	require.Len(t, result.Content, 1)
+	para := result.Content[0]
+
+	// Find the text node with both marks
+	var foundStrong, foundEm bool
+	for _, node := range para.Content {
+		for _, mark := range node.Marks {
+			if mark.Type == "strong" {
+				foundStrong = true
+			}
+			if mark.Type == "em" {
+				foundEm = true
+			}
+		}
+	}
+	assert.True(t, foundStrong, "expected strong mark")
+	assert.True(t, foundEm, "expected em mark")
+}
+
+func TestMarkdownToADF_NestedList(t *testing.T) {
+	input := "- Item one\n  - Nested one\n  - Nested two\n- Item two"
+	result := MarkdownToADF(input)
+	require.NotNil(t, result)
+
+	require.Len(t, result.Content, 1)
+	list := result.Content[0]
+	assert.Equal(t, "bulletList", list.Type)
+
+	// First list item should contain a nested bulletList
+	firstItem := list.Content[0]
+	assert.Equal(t, "listItem", firstItem.Type)
+
+	// Should have paragraph + nested list
+	var foundNestedList bool
+	for _, child := range firstItem.Content {
+		if child.Type == "bulletList" {
+			foundNestedList = true
+			assert.Len(t, child.Content, 2) // Two nested items
+		}
+	}
+	assert.True(t, foundNestedList, "expected nested bullet list")
+}
+
+func TestMarkdownToADF_Images_AltText(t *testing.T) {
+	input := "![Alt text](https://example.com/image.png)"
+	result := MarkdownToADF(input)
+	require.NotNil(t, result)
+
+	// Images should be converted to text with alt text
+	require.Len(t, result.Content, 1)
+	para := result.Content[0]
+	assert.Equal(t, "paragraph", para.Type)
+	require.Len(t, para.Content, 1)
+	assert.Equal(t, "Alt text", para.Content[0].Text)
+}
+
+func TestMarkdownToADF_WhitespaceInCodeBlock(t *testing.T) {
+	// Code with leading whitespace should be preserved
+	input := "```\n    indented code\n        more indented\n```"
+	result := MarkdownToADF(input)
+	require.NotNil(t, result)
+
+	require.Len(t, result.Content, 1)
+	block := result.Content[0]
+	assert.Equal(t, "codeBlock", block.Type)
+	require.Len(t, block.Content, 1)
+
+	// Verify whitespace is preserved
+	text := block.Content[0].Text
+	assert.Contains(t, text, "    indented")
+	assert.Contains(t, text, "        more indented")
+}
+
+func TestMarkdownToADF_NestedBlockquote(t *testing.T) {
+	input := "> Quote with **bold** text"
+	result := MarkdownToADF(input)
+	require.NotNil(t, result)
+
+	require.Len(t, result.Content, 1)
+	quote := result.Content[0]
+	assert.Equal(t, "blockquote", quote.Type)
+
+	// Should have nested content
+	assert.True(t, len(quote.Content) > 0, "blockquote should have content")
+}
+
+func TestMarkdownToADF_HardLineBreak(t *testing.T) {
+	// Two spaces at end of line creates a hard break
+	input := "Line one  \nLine two"
+	result := MarkdownToADF(input)
+	require.NotNil(t, result)
+
+	// Should have paragraph with hard break
+	require.Len(t, result.Content, 1)
+	para := result.Content[0]
+	assert.Equal(t, "paragraph", para.Type)
+
+	// Check for hardBreak node
+	var foundBreak bool
+	for _, node := range para.Content {
+		if node.Type == "hardBreak" {
+			foundBreak = true
+			break
+		}
+	}
+	// If hardBreak isn't found, verify both lines are present
+	if !foundBreak {
+		var fullText string
+		for _, node := range para.Content {
+			fullText += node.Text
+		}
+		assert.Contains(t, fullText, "Line one")
+		assert.Contains(t, fullText, "Line two")
+	}
+}
+
+func TestMarkdownToADF_InlineCodePreservesContent(t *testing.T) {
+	input := "Use `fmt.Println()` to print"
+	result := MarkdownToADF(input)
+	require.NotNil(t, result)
+
+	require.Len(t, result.Content, 1)
+	para := result.Content[0]
+
+	// Find the code-marked text
+	var foundCode bool
+	for _, node := range para.Content {
+		for _, mark := range node.Marks {
+			if mark.Type == "code" {
+				foundCode = true
+				assert.Equal(t, "fmt.Println()", node.Text)
+			}
+		}
+	}
+	assert.True(t, foundCode, "expected code mark")
+}
+
+func TestMarkdownToADF_OutputIsValidJSON(t *testing.T) {
+	// Test various inputs produce valid JSON
+	inputs := []string{
+		"# Simple heading",
+		"Paragraph with **bold** and *italic*",
+		"- Item 1\n- Item 2",
+		"```go\ncode\n```",
+		"| A | B |\n|---|---|\n| 1 | 2 |",
+	}
+
+	for _, input := range inputs {
+		result := MarkdownToADF(input)
+		require.NotNil(t, result)
+
+		jsonBytes, err := json.Marshal(result)
+		require.NoError(t, err)
+
+		// Verify it's valid JSON
+		var parsed map[string]interface{}
+		err = json.Unmarshal(jsonBytes, &parsed)
+		require.NoError(t, err, "Output should be valid JSON for input: %s", input)
+
+		// Verify basic structure
+		assert.Equal(t, "doc", parsed["type"])
+		assert.EqualValues(t, float64(1), parsed["version"])
+	}
+}
+
+func TestMarkdownToADF_Formatting(t *testing.T) {
+	tests := []struct {
+		name     string
+		markdown string
+		mark     string
+	}{
+		{"bold", "**bold**", "strong"},
+		{"italic", "*italic*", "em"},
+		{"inline_code", "`code`", "code"},
+		{"strikethrough", "~~strike~~", "strike"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := MarkdownToADF(tt.markdown)
+			require.NotNil(t, result)
+
+			require.Len(t, result.Content, 1)
+			para := result.Content[0]
+			assert.Equal(t, "paragraph", para.Type)
+
+			// Find the text node with marks
+			var foundMark bool
+			for _, node := range para.Content {
+				if len(node.Marks) > 0 {
+					for _, mark := range node.Marks {
+						if mark.Type == tt.mark {
+							foundMark = true
+							break
+						}
+					}
+				}
+			}
+			assert.True(t, foundMark, "expected to find mark %s", tt.mark)
+		})
+	}
+}

@@ -21,9 +21,10 @@ func MarkdownToADF(markdown string) *ADFDocument {
 
 	source := []byte(markdown)
 	reader := text.NewReader(source)
-	// Use goldmark with table extension
+	// Use goldmark with table and strikethrough extensions
 	md := goldmark.New(goldmark.WithExtensions(
 		extension.Table,
+		extension.Strikethrough,
 	))
 	doc := md.Parser().Parse(reader)
 
@@ -227,8 +228,11 @@ func convertInlineNode(node ast.Node, source []byte) []ADFNode {
 			return nil
 		}
 		nodes := []ADFNode{{Type: "text", Text: text}}
-		// Handle soft line breaks (newlines in source that aren't hard breaks)
-		if n.SoftLineBreak() {
+		// Handle hard line breaks (two spaces at end of line)
+		if n.HardLineBreak() {
+			nodes = append(nodes, ADFNode{Type: "hardBreak"})
+		} else if n.SoftLineBreak() {
+			// Handle soft line breaks (newlines in source that aren't hard breaks)
 			nodes = append(nodes, ADFNode{Type: "text", Text: " "})
 		}
 		return nodes
@@ -247,6 +251,10 @@ func convertInlineNode(node ast.Node, source []byte) []ADFNode {
 			markType = "strong"
 		}
 		return applyMark(content, markType)
+
+	case *east.Strikethrough:
+		content := convertInlineContent(n, source)
+		return applyMark(content, "strike")
 
 	case *ast.CodeSpan:
 		var buf bytes.Buffer
@@ -280,12 +288,18 @@ func convertInlineNode(node ast.Node, source []byte) []ADFNode {
 		return nil
 
 	case *ast.Image:
-		// Images in ADF are different - for now, convert to a link
-		return []ADFNode{{
-			Type:  "text",
-			Text:  string(n.Title),
-			Marks: []ADFMark{{Type: "link", Attrs: map[string]interface{}{"href": string(n.Destination)}}},
-		}}
+		// Images in ADF are different - extract alt text from children
+		var altBuilder strings.Builder
+		for child := n.FirstChild(); child != nil; child = child.NextSibling() {
+			if textNode, ok := child.(*ast.Text); ok {
+				altBuilder.Write(textNode.Segment.Value(source))
+			}
+		}
+		alt := altBuilder.String()
+		if alt == "" {
+			alt = string(n.Destination)
+		}
+		return []ADFNode{{Type: "text", Text: alt}}
 
 	default:
 		// For unknown inline nodes, try to extract text from children
