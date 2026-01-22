@@ -173,7 +173,7 @@ func runDo(opts *root.Options, issueKey, transitionNameOrID string, fieldArgs []
 			}
 
 			// Format value based on field type
-			fields[fieldID] = formatFieldValue(field, value)
+			fields[fieldID] = api.FormatFieldValue(field, value)
 		}
 	}
 
@@ -183,30 +183,4 @@ func runDo(opts *root.Options, issueKey, transitionNameOrID string, fieldArgs []
 
 	v.Success("Transitioned %s", issueKey)
 	return nil
-}
-
-// formatFieldValue formats a field value based on its type
-func formatFieldValue(field *api.Field, value string) interface{} {
-	if field == nil {
-		return value
-	}
-
-	// Handle different field types
-	switch field.Schema.Type {
-	case "option":
-		// Single select fields need {"value": "..."} format
-		return map[string]string{"value": value}
-	case "array":
-		// Multi-select options need [{"value": "..."}] format
-		if field.Schema.Items == "option" {
-			return []map[string]string{{"value": value}}
-		}
-		// Other arrays (like labels) are just string arrays
-		return []string{value}
-	case "user":
-		// User fields need {"accountId": "..."} format
-		return map[string]string{"accountId": value}
-	default:
-		return value
-	}
 }
