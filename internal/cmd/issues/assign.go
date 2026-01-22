@@ -52,7 +52,12 @@ func runAssign(opts *root.Options, issueKey, accountID string, unassign bool) er
 	if unassign || accountID == "" {
 		v.Success("Unassigned issue %s", issueKey)
 	} else {
-		v.Success("Assigned issue %s to %s", issueKey, accountID)
+		// Try to get the user's display name for a friendlier message
+		displayName := accountID
+		if user, err := client.GetUser(accountID); err == nil && user.DisplayName != "" {
+			displayName = user.DisplayName
+		}
+		v.Success("Assigned issue %s to %s", issueKey, displayName)
 	}
 
 	return nil

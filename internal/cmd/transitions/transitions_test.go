@@ -84,7 +84,7 @@ func TestFormatFieldValue(t *testing.T) {
 			want:  "Updated summary",
 		},
 		{
-			name: "number field - returns as-is (string)",
+			name: "number field - converts to float64",
 			field: &api.Field{
 				ID:   "customfield_10003",
 				Name: "Story Points",
@@ -93,13 +93,13 @@ func TestFormatFieldValue(t *testing.T) {
 				},
 			},
 			value: "5",
-			want:  "5",
+			want:  float64(5),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := formatFieldValue(tt.field, tt.value)
+			got := api.FormatFieldValue(tt.field, tt.value)
 			assert.Equal(t, tt.want, got)
 		})
 	}

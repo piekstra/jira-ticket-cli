@@ -73,12 +73,21 @@ func runUpdate(opts *root.Options, issueKey, summary, description string, fieldA
 
 			key, value := parts[0], parts[1]
 
-			fieldID, err := api.ResolveFieldID(allFields, key)
-			if err != nil {
+			// Try to resolve field name to ID and get field info
+			var fieldID string
+			var field *api.Field
+			if resolved := api.FindFieldByName(allFields, key); resolved != nil {
+				fieldID = resolved.ID
+				field = resolved
+			} else if resolved := api.FindFieldByID(allFields, key); resolved != nil {
+				fieldID = resolved.ID
+				field = resolved
+			} else {
 				fieldID = key
 			}
 
-			fields[fieldID] = value
+			// Format value based on field type
+			fields[fieldID] = api.FormatFieldValue(field, value)
 		}
 	}
 
