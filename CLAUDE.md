@@ -35,7 +35,7 @@ make clean
 
 ```
 jira-ticket-cli/
-├── cmd/jira-ticket-cli/main.go  # Entry point - registers commands, calls Execute()
+├── cmd/jtk/main.go  # Entry point - registers commands, calls Execute()
 ├── api/                          # Public Go library (importable)
 │   ├── client.go                # Client struct, New(), HTTP helpers
 │   ├── types.go                 # All data types (Issue, Sprint, Board, etc.)

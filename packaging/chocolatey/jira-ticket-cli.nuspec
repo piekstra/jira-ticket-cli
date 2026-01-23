@@ -22,7 +22,7 @@ Features:
 - Search with JQL queries
 - Add and view comments
 
-Binary: jira-ticket-cli.exe</description>
+Binary: jtk.exe</description>
     <summary>Command-line interface for Jira Cloud</summary>
     <releaseNotes>https://github.com/open-cli-collective/jira-ticket-cli/releases</releaseNotes>
     <tags>jira atlassian cli ticket issue-tracking agile</tags>

@@ -15,14 +15,14 @@ if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') {
     $arch = 'amd64'
     $checksum = $checksumAmd64
 } else {
-    throw "32-bit Windows is not supported. jira-ticket-cli requires 64-bit Windows."
+    throw "32-bit Windows is not supported. jtk requires 64-bit Windows."
 }
 
 $baseUrl = "https://github.com/open-cli-collective/jira-ticket-cli/releases/download/v${version}"
-$zipFile = "jira-ticket-cli_${version}_windows_${arch}.zip"
+$zipFile = "jtk_${version}_windows_${arch}.zip"
 $url = "${baseUrl}/${zipFile}"
 
-Write-Host "Installing jira-ticket-cli ${version} for Windows ${arch}..."
+Write-Host "Installing jtk ${version} for Windows ${arch}..."
 Write-Host "URL: ${url}"
 Write-Host "Checksum (SHA256): ${checksum}"
 
@@ -37,4 +37,4 @@ Install-ChocolateyZipPackage -PackageName $env:ChocolateyPackageName `
 New-Item "$toolsDir\LICENSE.ignore" -Type File -Force | Out-Null
 New-Item "$toolsDir\README.md.ignore" -Type File -Force | Out-Null
 
-Write-Host "jira-ticket-cli installed successfully. Run 'jira-ticket-cli --help' to get started."
+Write-Host "jira-ticket-cli installed successfully. Run 'jtk --help' to get started."

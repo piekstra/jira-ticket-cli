@@ -25,7 +25,7 @@ brew install --cask jira-ticket-cli
 ### Go Install
 
 ```bash
-go install github.com/open-cli-collective/jira-ticket-cli/cmd/jira-ticket-cli@latest
+go install github.com/open-cli-collective/jira-ticket-cli/cmd/jtk@latest
 ```
 
 ### Binary Download
@@ -34,10 +34,10 @@ Download the latest release from the [Releases page](https://github.com/open-cli
 
 ## Quick Start
 
-### 1. Configure jira-ticket-cli
+### 1. Configure jtk
 
 ```bash
-jira-ticket-cli config set \
+jtk config set \
   --domain mycompany \
   --email user@example.com \
   --token YOUR_API_TOKEN
@@ -48,13 +48,13 @@ Get your API token from: https://id.atlassian.com/manage-profile/security/api-to
 ### 2. List Issues
 
 ```bash
-jira-ticket-cli issues list --project MYPROJECT
+jtk issues list --project MYPROJECT
 ```
 
 ### 3. Get Issue Details
 
 ```bash
-jira-ticket-cli issues get PROJ-123
+jtk issues get PROJ-123
 ```
 
 ---
@@ -74,12 +74,12 @@ These flags are available on all commands:
 
 ---
 
-### `jira-ticket-cli config set`
+### `jtk config set`
 
 Configure Jira credentials.
 
 ```bash
-jira-ticket-cli config set --domain mycompany --email user@example.com --token YOUR_TOKEN
+jtk config set --domain mycompany --email user@example.com --token YOUR_TOKEN
 ```
 
 | Flag | Short | Default | Description |
@@ -90,16 +90,16 @@ jira-ticket-cli config set --domain mycompany --email user@example.com --token Y
 
 ---
 
-### `jira-ticket-cli issues list`
+### `jtk issues list`
 
 List issues in a project.
 
-**Aliases:** `jira-ticket-cli issues ls`
+**Aliases:** `jtk issues ls`
 
 ```bash
-jira-ticket-cli issues list --project MYPROJECT
-jira-ticket-cli issues list --project MYPROJECT --sprint current
-jira-ticket-cli issues list --project MYPROJECT -o json
+jtk issues list --project MYPROJECT
+jtk issues list --project MYPROJECT --sprint current
+jtk issues list --project MYPROJECT -o json
 ```
 
 | Flag | Short | Default | Description |
@@ -110,13 +110,13 @@ jira-ticket-cli issues list --project MYPROJECT -o json
 
 ---
 
-### `jira-ticket-cli issues get <issue-key>`
+### `jtk issues get <issue-key>`
 
 Get details of a specific issue.
 
 ```bash
-jira-ticket-cli issues get PROJ-123
-jira-ticket-cli issues get PROJ-123 -o json
+jtk issues get PROJ-123
+jtk issues get PROJ-123 -o json
 ```
 
 **Arguments:**
@@ -124,13 +124,13 @@ jira-ticket-cli issues get PROJ-123 -o json
 
 ---
 
-### `jira-ticket-cli issues create`
+### `jtk issues create`
 
 Create a new issue.
 
 ```bash
-jira-ticket-cli issues create --project MYPROJECT --type Task --summary "Fix login bug"
-jira-ticket-cli issues create -p MYPROJECT -t Story -s "Add new feature" --description "Details here"
+jtk issues create --project MYPROJECT --type Task --summary "Fix login bug"
+jtk issues create -p MYPROJECT -t Story -s "Add new feature" --description "Details here"
 ```
 
 | Flag | Short | Default | Description |
@@ -142,13 +142,13 @@ jira-ticket-cli issues create -p MYPROJECT -t Story -s "Add new feature" --descr
 
 ---
 
-### `jira-ticket-cli issues update <issue-key>`
+### `jtk issues update <issue-key>`
 
 Update an existing issue.
 
 ```bash
-jira-ticket-cli issues update PROJ-123 --summary "New summary"
-jira-ticket-cli issues update PROJ-123 --field priority=High
+jtk issues update PROJ-123 --summary "New summary"
+jtk issues update PROJ-123 --field priority=High
 ```
 
 | Flag | Short | Default | Description |
@@ -162,13 +162,13 @@ jira-ticket-cli issues update PROJ-123 --field priority=High
 
 ---
 
-### `jira-ticket-cli issues search`
+### `jtk issues search`
 
 Search issues using JQL.
 
 ```bash
-jira-ticket-cli issues search --jql "project = MYPROJECT AND status = 'In Progress'"
-jira-ticket-cli issues search --jql "assignee = currentUser()" -o json
+jtk issues search --jql "project = MYPROJECT AND status = 'In Progress'"
+jtk issues search --jql "assignee = currentUser()" -o json
 ```
 
 | Flag | Short | Default | Description |
@@ -178,12 +178,12 @@ jira-ticket-cli issues search --jql "assignee = currentUser()" -o json
 
 ---
 
-### `jira-ticket-cli issues assign <issue-key> <account-id>`
+### `jtk issues assign <issue-key> <account-id>`
 
 Assign an issue to a user.
 
 ```bash
-jira-ticket-cli issues assign PROJ-123 5b10ac8d82e05b22cc7d4ef5
+jtk issues assign PROJ-123 5b10ac8d82e05b22cc7d4ef5
 ```
 
 **Arguments:**
@@ -192,13 +192,13 @@ jira-ticket-cli issues assign PROJ-123 5b10ac8d82e05b22cc7d4ef5
 
 ---
 
-### `jira-ticket-cli issues fields [issue-key]`
+### `jtk issues fields [issue-key]`
 
 List available fields for issues.
 
 ```bash
-jira-ticket-cli issues fields
-jira-ticket-cli issues fields PROJ-123  # editable fields for specific issue
+jtk issues fields
+jtk issues fields PROJ-123  # editable fields for specific issue
 ```
 
 **Arguments:**
@@ -206,12 +206,12 @@ jira-ticket-cli issues fields PROJ-123  # editable fields for specific issue
 
 ---
 
-### `jira-ticket-cli transitions list <issue-key>`
+### `jtk transitions list <issue-key>`
 
 List available transitions for an issue.
 
 ```bash
-jira-ticket-cli transitions list PROJ-123
+jtk transitions list PROJ-123
 ```
 
 **Arguments:**
@@ -219,13 +219,13 @@ jira-ticket-cli transitions list PROJ-123
 
 ---
 
-### `jira-ticket-cli transitions do <issue-key> <transition>`
+### `jtk transitions do <issue-key> <transition>`
 
 Perform a transition on an issue.
 
 ```bash
-jira-ticket-cli transitions do PROJ-123 "In Progress"
-jira-ticket-cli transitions do PROJ-123 "Done"
+jtk transitions do PROJ-123 "In Progress"
+jtk transitions do PROJ-123 "Done"
 ```
 
 **Arguments:**
@@ -234,13 +234,13 @@ jira-ticket-cli transitions do PROJ-123 "Done"
 
 ---
 
-### `jira-ticket-cli comments list <issue-key>`
+### `jtk comments list <issue-key>`
 
 List comments on an issue.
 
 ```bash
-jira-ticket-cli comments list PROJ-123
-jira-ticket-cli comments list PROJ-123 -o json
+jtk comments list PROJ-123
+jtk comments list PROJ-123 -o json
 ```
 
 **Arguments:**
@@ -248,12 +248,12 @@ jira-ticket-cli comments list PROJ-123 -o json
 
 ---
 
-### `jira-ticket-cli comments add <issue-key>`
+### `jtk comments add <issue-key>`
 
 Add a comment to an issue.
 
 ```bash
-jira-ticket-cli comments add PROJ-123 --body "This is my comment"
+jtk comments add PROJ-123 --body "This is my comment"
 ```
 
 | Flag | Short | Default | Description |
@@ -265,13 +265,13 @@ jira-ticket-cli comments add PROJ-123 --body "This is my comment"
 
 ---
 
-### `jira-ticket-cli sprints list`
+### `jtk sprints list`
 
 List sprints for a board.
 
 ```bash
-jira-ticket-cli sprints list --board 123
-jira-ticket-cli sprints list --board 123 -o json
+jtk sprints list --board 123
+jtk sprints list --board 123 -o json
 ```
 
 | Flag | Short | Default | Description |
@@ -280,12 +280,12 @@ jira-ticket-cli sprints list --board 123 -o json
 
 ---
 
-### `jira-ticket-cli sprints current`
+### `jtk sprints current`
 
 Show the current active sprint.
 
 ```bash
-jira-ticket-cli sprints current --board 123
+jtk sprints current --board 123
 ```
 
 | Flag | Short | Default | Description |
@@ -294,13 +294,13 @@ jira-ticket-cli sprints current --board 123
 
 ---
 
-### `jira-ticket-cli sprints issues <sprint-id>`
+### `jtk sprints issues <sprint-id>`
 
 List issues in a sprint.
 
 ```bash
-jira-ticket-cli sprints issues 456
-jira-ticket-cli sprints issues 456 -o json
+jtk sprints issues 456
+jtk sprints issues 456 -o json
 ```
 
 **Arguments:**
@@ -308,13 +308,13 @@ jira-ticket-cli sprints issues 456 -o json
 
 ---
 
-### `jira-ticket-cli boards list`
+### `jtk boards list`
 
 List boards.
 
 ```bash
-jira-ticket-cli boards list
-jira-ticket-cli boards list --project MYPROJECT
+jtk boards list
+jtk boards list --project MYPROJECT
 ```
 
 | Flag | Short | Default | Description |
@@ -323,12 +323,12 @@ jira-ticket-cli boards list --project MYPROJECT
 
 ---
 
-### `jira-ticket-cli boards get <board-id>`
+### `jtk boards get <board-id>`
 
 Get board details.
 
 ```bash
-jira-ticket-cli boards get 123
+jtk boards get 123
 ```
 
 **Arguments:**
@@ -366,24 +366,24 @@ jira-ticket-cli supports tab completion for bash, zsh, fish, and PowerShell.
 
 ```bash
 # Load in current session
-source <(jira-ticket-cli completion bash)
+source <(jtk completion bash)
 
 # Install permanently (Linux)
-jira-ticket-cli completion bash | sudo tee /etc/bash_completion.d/jira-ticket-cli > /dev/null
+jtk completion bash | sudo tee /etc/bash_completion.d/jira-ticket-cli > /dev/null
 
 # Install permanently (macOS with Homebrew)
-jira-ticket-cli completion bash > $(brew --prefix)/etc/bash_completion.d/jira-ticket-cli
+jtk completion bash > $(brew --prefix)/etc/bash_completion.d/jira-ticket-cli
 ```
 
 ### Zsh
 
 ```bash
 # Load in current session
-source <(jira-ticket-cli completion zsh)
+source <(jtk completion zsh)
 
 # Install permanently
 mkdir -p ~/.zsh/completions
-jira-ticket-cli completion zsh > ~/.zsh/completions/_jira-ticket-cli
+jtk completion zsh > ~/.zsh/completions/_jira-ticket-cli
 
 # Add to ~/.zshrc if not already present:
 # fpath=(~/.zsh/completions $fpath)
@@ -394,20 +394,20 @@ jira-ticket-cli completion zsh > ~/.zsh/completions/_jira-ticket-cli
 
 ```bash
 # Load in current session
-jira-ticket-cli completion fish | source
+jtk completion fish | source
 
 # Install permanently
-jira-ticket-cli completion fish > ~/.config/fish/completions/jira-ticket-cli.fish
+jtk completion fish > ~/.config/fish/completions/jira-ticket-cli.fish
 ```
 
 ### PowerShell
 
 ```powershell
 # Load in current session
-jira-ticket-cli completion powershell | Out-String | Invoke-Expression
+jtk completion powershell | Out-String | Invoke-Expression
 
 # Install permanently (add to $PROFILE)
-jira-ticket-cli completion powershell >> $PROFILE
+jtk completion powershell >> $PROFILE
 ```
 
 ---

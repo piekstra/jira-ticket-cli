@@ -60,9 +60,9 @@ func NewCmd() (*cobra.Command, *Options) {
 	}
 
 	cmd := &cobra.Command{
-		Use:     "jira-ticket-cli",
+		Use:     "jtk",
 		Short:   "A CLI for managing Jira tickets",
-		Long:    "jira-ticket-cli is a command-line interface for managing Jira Cloud tickets.",
+		Long:    "jtk is a command-line interface for managing Jira Cloud tickets.",
 		Version: version.Info(),
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			// Setup is done in flag binding
