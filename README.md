@@ -13,24 +13,90 @@ A command-line interface for managing Jira Cloud tickets.
 
 ## Installation
 
-### Homebrew (macOS)
+### macOS
+
+**Homebrew (recommended)**
 
 ```bash
-brew tap open-cli-collective/tap
-brew install --cask jira-ticket-cli
+brew install open-cli-collective/tap/jira-ticket-cli
 ```
 
-> **Note:** Homebrew installation will be available after the first release.
+> Note: This installs from our third-party tap.
 
-### Go Install
+---
+
+### Windows
+
+**Chocolatey**
+
+```powershell
+choco install jira-ticket-cli
+```
+
+**Winget**
+
+```powershell
+winget install OpenCLICollective.jira-ticket-cli
+```
+
+---
+
+### Linux
+
+**Snap**
+
+```bash
+sudo snap install ocli-jira
+```
+
+> Note: After installation, the command is available as `jtk`.
+
+**APT (Debian/Ubuntu)**
+
+```bash
+# Add the GPG key
+curl -fsSL https://open-cli-collective.github.io/linux-packages/keys/gpg.asc | sudo gpg --dearmor -o /usr/share/keyrings/open-cli-collective.gpg
+
+# Add the repository
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/open-cli-collective.gpg] https://open-cli-collective.github.io/linux-packages/apt stable main" | sudo tee /etc/apt/sources.list.d/open-cli-collective.list
+
+# Install
+sudo apt update
+sudo apt install jtk
+```
+
+> Note: This is our third-party APT repository, not official Debian/Ubuntu repos.
+
+**DNF/YUM (Fedora/RHEL/CentOS)**
+
+```bash
+# Add the repository
+sudo tee /etc/yum.repos.d/open-cli-collective.repo << 'EOF'
+[open-cli-collective]
+name=Open CLI Collective
+baseurl=https://open-cli-collective.github.io/linux-packages/rpm
+enabled=1
+gpgcheck=1
+gpgkey=https://open-cli-collective.github.io/linux-packages/keys/gpg.asc
+EOF
+
+# Install
+sudo dnf install jtk
+```
+
+> Note: This is our third-party RPM repository, not official Fedora/RHEL repos.
+
+**Binary download**
+
+Download `.deb`, `.rpm`, or `.tar.gz` from the [Releases page](https://github.com/open-cli-collective/jira-ticket-cli/releases).
+
+---
+
+### From Source
 
 ```bash
 go install github.com/open-cli-collective/jira-ticket-cli/cmd/jtk@latest
 ```
-
-### Binary Download
-
-Download the latest release from the [Releases page](https://github.com/open-cli-collective/jira-ticket-cli/releases).
 
 ## Quick Start
 
