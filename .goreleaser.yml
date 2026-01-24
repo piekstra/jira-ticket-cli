@@ -39,6 +39,23 @@ archives:
       - LICENSE
       - README.md
 
+# Linux packages (.deb and .rpm)
+nfpms:
+  - id: jtk
+    package_name: jtk
+    vendor: Open CLI Collective
+    homepage: https://github.com/open-cli-collective/jira-ticket-cli
+    maintainer: Open CLI Collective <https://github.com/open-cli-collective>
+    description: Command-line interface for Jira Cloud
+    license: MIT
+    formats:
+      - deb
+      - rpm
+    bindir: /usr/bin
+    contents:
+      - src: LICENSE
+        dst: /usr/share/licenses/jtk/LICENSE
+
 checksum:
   name_template: 'checksums.txt'
 
