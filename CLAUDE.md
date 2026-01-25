@@ -170,11 +170,15 @@ This means:
 
 ## Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| `JIRA_URL` | Full Jira URL (e.g., `https://mycompany.atlassian.net` or `https://jira.internal.corp.com`) |
-| `JIRA_EMAIL` | Your Atlassian email |
-| `JIRA_API_TOKEN` | Your API token |
+Variables are checked in precedence order (first match wins):
+
+| Setting | Precedence |
+|---------|------------|
+| URL | `JIRA_URL` → `ATLASSIAN_URL` → config |
+| Email | `JIRA_EMAIL` → `ATLASSIAN_EMAIL` → config |
+| API Token | `JIRA_API_TOKEN` → `ATLASSIAN_API_TOKEN` → config |
+
+Use `ATLASSIAN_*` for shared credentials across jtk and cfl. Use `JIRA_*` to override per-tool.
 
 > **Note:** `JIRA_DOMAIN` is deprecated but still supported for backwards compatibility.
 

@@ -101,8 +101,8 @@ func newShowCmd(opts *root.Options) *cobra.Command {
 			headers := []string{"KEY", "VALUE", "SOURCE"}
 			rows := [][]string{
 				{"url", url, getURLSource()},
-				{"email", email, getSource("JIRA_EMAIL", email)},
-				{"api_token", maskedToken, getSource("JIRA_API_TOKEN", token)},
+				{"email", email, getEmailSource()},
+				{"api_token", maskedToken, getAPITokenSource()},
 			}
 
 			data := map[string]string{
@@ -140,19 +140,12 @@ func newClearCmd(opts *root.Options) *cobra.Command {
 	}
 }
 
-func getSource(envVar, value string) string {
-	if value == "" {
-		return "-"
-	}
-	if os.Getenv(envVar) != "" {
-		return "env"
-	}
-	return "config"
-}
-
 func getURLSource() string {
 	if os.Getenv("JIRA_URL") != "" {
 		return "env (JIRA_URL)"
+	}
+	if os.Getenv("ATLASSIAN_URL") != "" {
+		return "env (ATLASSIAN_URL)"
 	}
 	cfg, err := config.Load()
 	if err != nil {
@@ -167,6 +160,40 @@ func getURLSource() string {
 	}
 	if cfg.Domain != "" {
 		return "config (domain, deprecated)"
+	}
+	return "-"
+}
+
+func getEmailSource() string {
+	if os.Getenv("JIRA_EMAIL") != "" {
+		return "env (JIRA_EMAIL)"
+	}
+	if os.Getenv("ATLASSIAN_EMAIL") != "" {
+		return "env (ATLASSIAN_EMAIL)"
+	}
+	cfg, err := config.Load()
+	if err != nil {
+		return "-"
+	}
+	if cfg.Email != "" {
+		return "config"
+	}
+	return "-"
+}
+
+func getAPITokenSource() string {
+	if os.Getenv("JIRA_API_TOKEN") != "" {
+		return "env (JIRA_API_TOKEN)"
+	}
+	if os.Getenv("ATLASSIAN_API_TOKEN") != "" {
+		return "env (ATLASSIAN_API_TOKEN)"
+	}
+	cfg, err := config.Load()
+	if err != nil {
+		return "-"
+	}
+	if cfg.APIToken != "" {
+		return "config"
 	}
 	return "-"
 }

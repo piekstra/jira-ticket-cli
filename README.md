@@ -437,15 +437,31 @@ Configuration is stored in `~/.config/jira-ticket-cli/config.json`:
 
 ### Environment Variables
 
-Environment variables override config file values:
+Environment variables override config file values. Variables are checked in order of precedence (first match wins):
 
-| Variable | Description |
-|----------|-------------|
-| `JIRA_URL` | Full Jira URL (e.g., `https://mycompany.atlassian.net` or `https://jira.internal.corp.com`) |
-| `JIRA_EMAIL` | Your Atlassian email |
-| `JIRA_API_TOKEN` | Your API token |
+| Setting | Precedence (highest to lowest) |
+|---------|-------------------------------|
+| URL | `JIRA_URL` → `ATLASSIAN_URL` → config file |
+| Email | `JIRA_EMAIL` → `ATLASSIAN_EMAIL` → config file |
+| API Token | `JIRA_API_TOKEN` → `ATLASSIAN_API_TOKEN` → config file |
 
-> **Note:** The legacy `JIRA_DOMAIN` environment variable is still supported for backwards compatibility but is deprecated. Use `JIRA_URL` instead.
+**Shared credentials:** If you use both `jtk` and `cfl` (Confluence CLI), set `ATLASSIAN_*` variables once:
+
+```bash
+export ATLASSIAN_URL=https://mycompany.atlassian.net
+export ATLASSIAN_EMAIL=user@example.com
+export ATLASSIAN_API_TOKEN=your-api-token
+```
+
+**Per-tool override:** Use `JIRA_*` to override for Jira specifically:
+
+```bash
+export ATLASSIAN_EMAIL=user@example.com
+export ATLASSIAN_API_TOKEN=your-api-token
+export JIRA_URL=https://jira.internal.corp.com  # Different URL for Jira
+```
+
+> **Note:** The legacy `JIRA_DOMAIN` environment variable is still supported for backwards compatibility but is deprecated.
 
 ---
 

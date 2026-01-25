@@ -22,11 +22,14 @@ func setupTestConfig(t *testing.T) (string, func()) {
 	t.Setenv("XDG_CONFIG_HOME", tempDir)
 	t.Setenv("HOME", tempDir)
 
-	// Clear any JIRA env vars that might interfere
+	// Clear any JIRA and ATLASSIAN env vars that might interfere
 	t.Setenv("JIRA_URL", "")
 	t.Setenv("JIRA_DOMAIN", "")
 	t.Setenv("JIRA_EMAIL", "")
 	t.Setenv("JIRA_API_TOKEN", "")
+	t.Setenv("ATLASSIAN_URL", "")
+	t.Setenv("ATLASSIAN_EMAIL", "")
+	t.Setenv("ATLASSIAN_API_TOKEN", "")
 
 	// Create macOS-style dir as well for fallback
 	libDir := filepath.Join(tempDir, "Library", "Application Support")
@@ -332,4 +335,86 @@ func TestPath(t *testing.T) {
 	path := Path()
 	assert.Contains(t, path, configDirName)
 	assert.Contains(t, path, configFileName)
+}
+
+// Tests for ATLASSIAN_* env var fallbacks
+
+func TestGetURL_AtlassianFallback(t *testing.T) {
+	_, cleanup := setupTestConfig(t)
+	defer cleanup()
+
+	// ATLASSIAN_URL should work when JIRA_URL is not set
+	t.Setenv("ATLASSIAN_URL", "https://shared.atlassian.net")
+	assert.Equal(t, "https://shared.atlassian.net", GetURL())
+
+	// JIRA_URL takes precedence over ATLASSIAN_URL
+	t.Setenv("JIRA_URL", "https://jira-specific.atlassian.net")
+	assert.Equal(t, "https://jira-specific.atlassian.net", GetURL())
+}
+
+func TestGetEmail_AtlassianFallback(t *testing.T) {
+	_, cleanup := setupTestConfig(t)
+	defer cleanup()
+
+	// ATLASSIAN_EMAIL should work when JIRA_EMAIL is not set
+	t.Setenv("ATLASSIAN_EMAIL", "shared@example.com")
+	assert.Equal(t, "shared@example.com", GetEmail())
+
+	// JIRA_EMAIL takes precedence over ATLASSIAN_EMAIL
+	t.Setenv("JIRA_EMAIL", "jira@example.com")
+	assert.Equal(t, "jira@example.com", GetEmail())
+}
+
+func TestGetAPIToken_AtlassianFallback(t *testing.T) {
+	_, cleanup := setupTestConfig(t)
+	defer cleanup()
+
+	// ATLASSIAN_API_TOKEN should work when JIRA_API_TOKEN is not set
+	t.Setenv("ATLASSIAN_API_TOKEN", "shared-token")
+	assert.Equal(t, "shared-token", GetAPIToken())
+
+	// JIRA_API_TOKEN takes precedence over ATLASSIAN_API_TOKEN
+	t.Setenv("JIRA_API_TOKEN", "jira-token")
+	assert.Equal(t, "jira-token", GetAPIToken())
+}
+
+func TestIsConfigured_AtlassianEnvOnly(t *testing.T) {
+	_, cleanup := setupTestConfig(t)
+	defer cleanup()
+
+	// Set all ATLASSIAN_* env vars (shared credentials)
+	t.Setenv("ATLASSIAN_URL", "https://shared.atlassian.net")
+	t.Setenv("ATLASSIAN_EMAIL", "shared@example.com")
+	t.Setenv("ATLASSIAN_API_TOKEN", "shared-token")
+
+	// Should be configured via shared env vars
+	assert.True(t, IsConfigured())
+}
+
+func TestGetURL_FullPrecedenceChain(t *testing.T) {
+	_, cleanup := setupTestConfig(t)
+	defer cleanup()
+
+	// Start with config file only
+	cfg := &Config{
+		URL:    "https://config-url.atlassian.net",
+		Domain: "config-domain",
+	}
+	Save(cfg)
+
+	// Config URL should be returned
+	assert.Equal(t, "https://config-url.atlassian.net", GetURL())
+
+	// Clear config, set legacy JIRA_DOMAIN
+	Clear()
+	t.Setenv("JIRA_DOMAIN", "env-domain")
+	assert.Equal(t, "https://env-domain.atlassian.net", GetURL())
+
+	// ATLASSIAN_URL takes precedence over JIRA_DOMAIN
+	t.Setenv("ATLASSIAN_URL", "https://atlassian-url.atlassian.net")
+	assert.Equal(t, "https://atlassian-url.atlassian.net", GetURL())
+
+	// JIRA_URL takes precedence over ATLASSIAN_URL
+	t.Setenv("JIRA_URL", "https://jira-url.atlassian.net")
+	assert.Equal(t, "https://jira-url.atlassian.net", GetURL())
 }

@@ -95,9 +95,12 @@ func Clear() error {
 }
 
 // GetURL returns the Jira URL from config or environment.
-// It checks JIRA_URL first, then falls back to constructing from JIRA_DOMAIN for backwards compatibility.
+// Precedence: JIRA_URL → ATLASSIAN_URL → config url → JIRA_DOMAIN (legacy) → config domain (legacy)
 func GetURL() string {
 	if v := os.Getenv("JIRA_URL"); v != "" {
+		return NormalizeURL(v)
+	}
+	if v := os.Getenv("ATLASSIAN_URL"); v != "" {
 		return NormalizeURL(v)
 	}
 	cfg, err := Load()
@@ -143,9 +146,13 @@ func NormalizeURL(u string) string {
 	return strings.TrimSuffix(u, "/")
 }
 
-// GetEmail returns the email from config or environment
+// GetEmail returns the email from config or environment.
+// Precedence: JIRA_EMAIL → ATLASSIAN_EMAIL → config email
 func GetEmail() string {
 	if v := os.Getenv("JIRA_EMAIL"); v != "" {
+		return v
+	}
+	if v := os.Getenv("ATLASSIAN_EMAIL"); v != "" {
 		return v
 	}
 	cfg, err := Load()
@@ -155,9 +162,13 @@ func GetEmail() string {
 	return cfg.Email
 }
 
-// GetAPIToken returns the API token from config or environment
+// GetAPIToken returns the API token from config or environment.
+// Precedence: JIRA_API_TOKEN → ATLASSIAN_API_TOKEN → config api_token
 func GetAPIToken() string {
 	if v := os.Getenv("JIRA_API_TOKEN"); v != "" {
+		return v
+	}
+	if v := os.Getenv("ATLASSIAN_API_TOKEN"); v != "" {
 		return v
 	}
 	cfg, err := Load()
