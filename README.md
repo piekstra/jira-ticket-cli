@@ -88,7 +88,17 @@ sudo dnf install jtk
 
 **Binary download**
 
-Download `.deb`, `.rpm`, or `.tar.gz` from the [Releases page](https://github.com/open-cli-collective/jira-ticket-cli/releases).
+Download `.deb`, `.rpm`, or `.tar.gz` from the [Releases page](https://github.com/open-cli-collective/jira-ticket-cli/releases) - available for x64 and ARM64.
+
+```bash
+# Direct .deb install
+curl -LO https://github.com/open-cli-collective/jira-ticket-cli/releases/latest/download/jtk_VERSION_linux_amd64.deb
+sudo dpkg -i jtk_VERSION_linux_amd64.deb
+
+# Direct .rpm install
+curl -LO https://github.com/open-cli-collective/jira-ticket-cli/releases/latest/download/jtk-VERSION.x86_64.rpm
+sudo rpm -i jtk-VERSION.x86_64.rpm
+```
 
 ---
 
