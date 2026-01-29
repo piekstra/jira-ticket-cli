@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/open-cli-collective/jira-ticket-cli/internal/cmd/attachments"
 	"github.com/open-cli-collective/jira-ticket-cli/internal/cmd/boards"
 	"github.com/open-cli-collective/jira-ticket-cli/internal/cmd/comments"
 	"github.com/open-cli-collective/jira-ticket-cli/internal/cmd/completion"
@@ -34,6 +35,7 @@ func run() error {
 	issues.Register(rootCmd, opts)
 	transitions.Register(rootCmd, opts)
 	comments.Register(rootCmd, opts)
+	attachments.Register(rootCmd, opts)
 	boards.Register(rootCmd, opts)
 	sprints.Register(rootCmd, opts)
 	users.Register(rootCmd, opts)
