@@ -17,6 +17,10 @@ export JIRA_TEST_PROJECT="TEST"
 # Optional: specify the issue type to use (default: "Task")
 # Some projects may use different names like "SDLC", "Story", "Bug", etc.
 export JIRA_TEST_ISSUE_TYPE="Task"
+
+# For move tests, specify a DIFFERENT target project
+# Move tests require two projects to move issues between them
+export JIRA_TEST_MOVE_TARGET_PROJECT="TARGET"
 ```
 
 Alternatively, use `ATLASSIAN_URL`, `ATLASSIAN_EMAIL`, `ATLASSIAN_API_TOKEN` if you have those configured.

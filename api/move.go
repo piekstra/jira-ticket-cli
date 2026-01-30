@@ -78,7 +78,8 @@ func (c *Client) GetMoveTaskStatus(taskID string) (*MoveTaskStatus, error) {
 		return nil, fmt.Errorf("task ID is required")
 	}
 
-	urlStr := fmt.Sprintf("%s/bulk/issues/move/%s", c.BaseURL, taskID)
+	// Status endpoint is /bulk/queue/{taskId}
+	urlStr := fmt.Sprintf("%s/bulk/queue/%s", c.BaseURL, taskID)
 
 	body, err := c.get(urlStr)
 	if err != nil {
@@ -147,8 +148,8 @@ type ProjectStatus struct {
 
 // BuildMoveRequest creates a move request for a simple move operation
 func BuildMoveRequest(issueKeys []string, targetProject, targetIssueTypeID string, notify bool) MoveIssuesRequest {
-	// Target key format: "PROJECT_KEY:ISSUE_TYPE_ID"
-	targetKey := fmt.Sprintf("%s:%s", targetProject, targetIssueTypeID)
+	// Target key format: "PROJECT_KEY,ISSUE_TYPE_ID" (comma-separated per Jira API docs)
+	targetKey := fmt.Sprintf("%s,%s", targetProject, targetIssueTypeID)
 
 	return MoveIssuesRequest{
 		SendBulkNotification: notify,

@@ -46,6 +46,18 @@ func getTestIssueType(t *testing.T) string {
 	return issueType
 }
 
+// getTestMoveTargetProject returns the target project for move tests
+// Set JIRA_TEST_MOVE_TARGET_PROJECT to a different project than JIRA_TEST_PROJECT
+func getTestMoveTargetProject(t *testing.T) string {
+	t.Helper()
+
+	project := os.Getenv("JIRA_TEST_MOVE_TARGET_PROJECT")
+	if project == "" {
+		t.Skip("JIRA_TEST_MOVE_TARGET_PROJECT not set (set to a different project than JIRA_TEST_PROJECT)")
+	}
+	return project
+}
+
 // newTestClient creates an API client for integration tests
 func newTestClient(t *testing.T) *api.Client {
 	t.Helper()
